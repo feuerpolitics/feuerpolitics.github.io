@@ -45,67 +45,98 @@ svg{width:100%;max-width:460px;display:block;margin:12px auto;border:1px solid v
 @keyframes hue{to{filter:brightness(1.3) saturate(2) contrast(1.15) hue-rotate(360deg)}}
 @media(max-width:800px){.side{opacity:.35;max-width:40vw}}
 @media(prefers-reduced-motion:reduce){.spin,.bob,#app.fx{animation:none}}
+#dev{position:fixed;inset:auto 16px 16px auto;z-index:99;background:#010409;border:1px solid var(--bl);border-radius:6px;padding:14px;width:300px;display:none}
+#dev label{display:block;margin:6px 0 0;color:var(--mu)}#dev input,#dev select{width:100%}
 </style></head><body>
 <header><svg viewBox="0 0 16 16" width="28" height="28" style="width:28px;border:0;margin:0" fill="#e6edf3"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38v-1.33c-2.22.48-2.69-1.07-2.69-1.07-.36-.92-.89-1.17-.89-1.17-.73-.5.05-.49.05-.49.8.06 1.23.83 1.23.83.71 1.22 1.87.87 2.33.66.07-.52.28-.87.5-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.6 7.6 0 0 1 4 0c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.28.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48v2.2c0 .21.15.46.55.38A8 8 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg><b onclick="home()">Feuer</b><span>/ political compass</span></header>
 <div id="app"><main id="m"></main></div>
 <audio id="au" loop></audio>
 <script>
-// ---- DATA ----
-// x: economic (-10 left .. 10 right), y: social (-10 libertarian .. 10 authoritarian)
-const IDEO=[["Stalinism",-9,9],["Maoism",-8,7],["Leninism",-8,6],["Marxism-Leninism",-7,8],["Communism",-9,2],["Marxism",-7,3],["Trotskyism",-7,0],["Anarcho-Communism",-9,-8],["Anarcho-Syndicalism",-7,-8],["Anarchism",-5,-10],["Libertarian Socialism",-6,-6],["Democratic Socialism",-5,-1],["Eco-Socialism",-6,-3],["Social Democracy",-3,-1],["Market Socialism",-4,1],["Left-Wing Populism",-4,3],["Progressivism",-3,-4],["Social Liberalism",-2,-5],["Left-Libertarianism",-3,-8],["Green Politics",-4,-5],["Liberalism",1,-4],["Classical Liberalism",4,-5],["Neoliberalism",5,-2],["Libertarianism",7,-8],["Minarchism",8,-6],["Anarcho-Capitalism",10,-10],["Objectivism",9,-5],["Centrism",0,0],["Third Way",1,0],["Technocracy",0,4],["Conservatism",5,4],["Liberal Conservatism",5,0],["Fiscal Conservatism",7,-1],["Neoconservatism",6,6],["Paleoconservatism",5,6],["Christian Democracy",2,3],["Right-Wing Populism",3,6],["Nationalism",3,7],["Authoritarian Capitalism",8,8],["Monarchism",5,8],["Theocracy",2,9],["Fascism",3,9],["Nazism",4,10],["Corporatism",2,7],["National Bolshevism",-2,8],["Social Authoritarianism",-4,6],["Distributism",-2,2],["Georgism",-1,-3],["Mutualism",-5,-7],["Paternalistic Conservatism",3,3],["Communitarianism",-1,4],["Libertarian Conservatism",6,-3]];
-// [text, axis, sign] sign +1: agreeing = right (E) / authoritarian (S)
-const E=[["Free markets allocate resources better than governments.",1],["The wealthy should be taxed far more to fund public services.",-1],["Private companies, not the state, should run healthcare.",1],["Workers should own or control the companies they work at.",-1],["Minimum wage laws do more harm than good.",1],["Energy and railways should be publicly owned.",-1],["Inheritance should not be taxed.",1],["Billionaires should not exist.",-1],["Welfare programs make people dependent.",1],["Rent and housing prices should be controlled by the state.",-1],["Trade unions have too much power.",1],["Education should be free at every level.",-1],["Competition matters more than equality.",1],["A universal basic income should be introduced.",-1],["Privatising state services usually improves them.",1],["Capitalism is fundamentally exploitative.",-1],["Property rights are absolute.",1],["The economy should be planned democratically, not left to markets.",-1]];
-const S=[["Obedience to authority is a core virtue.",1],["Drug use should be legal for adults.",-1],["Strong leaders matter more than debate and compromise.",1],["Government surveillance of citizens is never justified.",-1],["Traditional values should be protected by law.",1],["Same-sex marriage should be fully legal.",-1],["The nation comes before the individual.",1],["Free speech should cover even offensive views.",-1],["Harsh punishments deter crime effectively.",1],["Immigration should be largely open.",-1],["Military service should be compulsory.",1],["Abortion should be the individual's choice.",-1],["The state should control media to stop disinformation.",1],["Police powers should be strictly limited.",-1],["Religion should shape public law.",1],["Nobody should be forced to follow the state's authority.",-1],["Order is more important than liberty.",1],["Censorship is always wrong.",-1]];
-const QS=[];for(let i=0;i<18;i++){QS.push([...E[i],"E"]);QS.push([...S[i],"S"])}
+// ===== DATA =====
+// [name, economic(-10 left..10 right), social(-10 libertarian..10 authoritarian), nationalism(-10 globalist..10 nationalist)]
+const IDEO=[["Stalinism",-9,9,3],["Maoism",-8,7,4],["Leninism",-8,6,-3],["Marxism-Leninism",-7,8,0],["Communism",-9,2,-7],["Marxism",-7,3,-7],["Trotskyism",-7,0,-9],["Anarcho-Communism",-9,-8,-9],["Anarcho-Syndicalism",-7,-8,-8],["Anarchism",-5,-10,-8],["Libertarian Socialism",-6,-6,-7],["Democratic Socialism",-5,-1,-4],["Eco-Socialism",-6,-3,-6],["Social Democracy",-3,-1,-3],["Market Socialism",-4,1,-3],["Left-Wing Populism",-4,3,2],["Progressivism",-3,-4,-5],["Social Liberalism",-2,-5,-5],["Left-Libertarianism",-3,-8,-6],["Green Politics",-4,-5,-6],["Liberalism",1,-4,-4],["Classical Liberalism",4,-5,-4],["Neoliberalism",5,-2,-4],["Libertarianism",7,-8,-3],["Minarchism",8,-6,-2],["Anarcho-Capitalism",10,-10,-5],["Objectivism",9,-5,-2],["Centrism",0,0,0],["Third Way",1,0,-2],["Technocracy",0,4,-2],["Conservatism",5,4,4],["Liberal Conservatism",5,0,1],["Fiscal Conservatism",7,-1,0],["Neoconservatism",6,6,5],["Paleoconservatism",5,6,8],["Christian Democracy",2,3,2],["Right-Wing Populism",3,6,7],["Nationalism",3,7,9],["Authoritarian Capitalism",8,8,4],["Monarchism",5,8,5],["Theocracy",2,9,4],["Fascism",3,9,10],["Nazism",4,10,10],["Corporatism",2,7,6],["National Bolshevism",-2,8,8],["Social Authoritarianism",-4,6,2],["Distributism",-2,2,1],["Georgism",-1,-3,-3],["Mutualism",-5,-7,-6],["Paternalistic Conservatism",3,3,4],["Communitarianism",-1,4,3],["Libertarian Conservatism",6,-3,3]];
+// [text, sign]  sign +1: agreeing = right / authoritarian / nationalist
+const E=[["Free markets allocate resources better than governments.",1],["The wealthy should be taxed far more to fund public services.",-1],["Private companies, not the state, should run healthcare.",1],["Workers should own or control the companies they work at.",-1],["Minimum wage laws do more harm than good.",1],["Energy and railways should be publicly owned.",-1],["Inheritance should not be taxed.",1],["Billionaires should not exist.",-1],["Welfare programs make people dependent.",1],["Rent and housing prices should be controlled by the state.",-1],["Trade unions have too much power.",1],["Education should be free at every level.",-1]];
+const S=[["Obedience to authority is a core virtue.",1],["Drug use should be legal for adults.",-1],["Strong leaders matter more than debate and compromise.",1],["Government surveillance of citizens is never justified.",-1],["Traditional values should be protected by law.",1],["Same-sex marriage should be fully legal.",-1],["The state should control media to stop disinformation.",1],["Free speech should cover even offensive views.",-1],["Harsh punishments deter crime effectively.",1],["Police powers should be strictly limited.",-1],["Order is more important than liberty.",1],["Censorship is always wrong.",-1]];
+const N=[["My nation's interests should come before international cooperation.",1],["International bodies should have real power over nations.",-1],["Industry should serve the national interest under state direction.",1],["Nations are arbitrary; all peoples are fundamentally equal.",-1],["National rebirth requires sacrifice from the people.",1],["Patriotism is overrated.",-1],["Class conflict should be replaced by national unity.",1],["People should see themselves as global citizens first.",-1],["Violence can be justified to defend the nation.",1],["Cultural mixing makes a country stronger.",-1],["A nation's culture should be protected from foreign influence.",1],["Armies and flags do more harm than good.",-1]];
+const QS=[];for(let i=0;i<12;i++){QS.push([...E[i],"E"],[...S[i],"S"],[...N[i],"N"])}
 const LEN={short:12,medium:24,long:36};
 const ANS=[["Strongly agree",2],["Agree",1],["Neutral",0],["Disagree",-1],["Strongly disagree",-2]];
+const W=[.5,1,1]; // distance weights: economic, social, nationalism
 
-// ---- EASTER EGGS ----
+// ===== EASTER EGG TABLE =====
+// One object per egg. Add rows freely.
+//  names : exact ideology names (from IDEO) that trigger it
+//  left  : image URL on the left (spins)      right : image URL on the right (bobs)
+//  audio : sound URL/path (loops)
+// Template:
+// {names:["Ideology A","Ideology B"], left:"url", right:"url", audio:"url"},
 const AUD="https://cdn.discordapp.com/attachments/1447635435353411746/";
 const EGGS=[
- {test:n=>/Communism|Leninism|Stalinism/.test(n),
+ {names:["Communism","Leninism","Stalinism","Marxism-Leninism","Anarcho-Communism"],
   left:"https://thumb.wikimedia.org/wikipedia/commons/thumb/4/41/Hammer_and_sickle_red_on_transparent.svg/250px-Hammer_and_sickle_red_on_transparent.svg.png",
   right:"https://soyjakwiki.org/images/b/ba/Marx_A24_Slowburn.png",
   audio:AUD+"1574451938781560862/Ballern_und_Saufen_Slowed_Version.mp3?ex=6b05b222&is=6b0460a2&hm=a64394fdcd087b387b5959ce925d61a2d02002a88e9557dd30cc6f90b15ecab6&"},
- {test:n=>/Anarcho-Capitalism|^Libertarianism$/.test(n),
+ {names:["Anarcho-Capitalism","Libertarianism"],
   left:"https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e6/Anarcho_Capitalism_Symbol.svg/960px-Anarcho_Capitalism_Symbol.svg.png",
   right:"https://soyjakwiki.org/images/thumb/7/7a/Puppeteer.png/960px-Puppeteer.png.webp",
-  audio:AUD+"1574453108648575036/Jeffrey_Epstein_Lil_Pump_Boss_X_Hunniddolla_Slowed.mp3?ex=6b05b339&is=6b0461b9&hm=2f6165e984a8f3a62f76a4c91d2e90b6f958ae64fe5d5c8b293ae2b9f49a7f5e&"}
+  audio:AUD+"1574453108648575036/Jeffrey_Epstein_Lil_Pump_Boss_X_Hunniddolla_Slowed.mp3?ex=6b05b339&is=6b0461b9&hm=2f6165e984a8f3a62f76a4c91d2e90b6f958ae64fe5d5c8b293ae2b9f49a7f5e&"},
+  {names:["Fascism","Nazism"],
+  left:"https://thumb.wikimedia.org/wikipedia/commons/thumb/6/67/Coa_Illustration_Cross_Swastika_diagonally_positioned.svg/330px-Coa_Illustration_Cross_Swastika_diagonally_positioned.svg.png?utm_source=commons.wikimedia.org&utm_campaign=index&utm_content=thumbnail&_=20110714125013",
+  right:"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRu0OdN3p0VNdZHMYRLps-oGhSb0mVr4KCu8cIkO_dIAPp9kCgrdulQiOQ&s=10",
+  audio:"https://soyjakwiki.org/images/c/cc/Safe_and_Sound_X_Ye_-_NHH_%28Extended_%2B_Hardstyle%29_Reuploaded.mp3"}
 ];
-// Fascism/Nazism: no easter egg; they get the normal result screen.
 
-// ---- STATE / UI ----
+// ===== UI =====
 const $=s=>document.querySelector(s),m=$("#m"),app=$("#app"),au=$("#au");
 let qs=[],i=0,sc,len;
 function clearFx(){au.pause();au.removeAttribute("src");app.classList.remove("fx");document.querySelectorAll(".side").forEach(e=>e.remove())}
 function home(){clearFx();m.innerHTML=`<h1 class="t">Feuer</h1><p class="sub">Find your place on the political compass.</p>
-<div class="card"><h3>Choose a test length</h3><p>Answers are scored on two axes: economic and social.</p>
+<div class="card"><h3>Choose a test length</h3><p>Answers are scored on economic, social and national axes.</p>
 <div class="row"><button class="pri" onclick="start('short')">Short (12)</button><button class="pri" onclick="start('medium')">Medium (24)</button><button class="pri" onclick="start('long')">Long (36)</button></div></div>
-<div class="card"><h3>What you get</h3><p style="margin:0">A plotted position on the compass and a match from 52 ideologies.</p></div>`}
-function start(k){clearFx();len=k;qs=QS.slice(0,LEN[k]);i=0;sc={E:0,S:0};show()}
+<div class="card"><h3>What you get</h3><p style="margin:0">A plotted position on the compass and a match from ${IDEO.length} ideologies.</p></div>`}
+function start(k){clearFx();len=k;qs=QS.slice(0,LEN[k]);i=0;sc={E:0,S:0,N:0};show()}
 function show(){const q=qs[i];m.innerHTML=`<div class="meta">Question ${i+1} of ${qs.length}</div><div class="bar"><i style="width:${i/qs.length*100}%"></i></div>
 <div class="card"><p class="q">${q[0]}</p><div class="opts">${ANS.map(a=>`<button onclick="ans(${a[1]})">${a[0]}</button>`).join("")}</div></div>
 <button onclick="home()">Quit to main menu</button>`}
-function ans(v){const q=qs[i];sc[q[2]]+=v*q[1];i++;i<qs.length?show():result()}
-function result(){
- const nE=qs.filter(q=>q[2]=="E").length,nS=qs.length-nE;
- const x=sc.E/(nE*2)*10,y=sc.S/(nS*2)*10;
- const r=IDEO.map(d=>[d[0],Math.hypot(d[1]-x,d[2]-y)]).sort((a,b)=>a[1]-b[1]);
- const top=r[0][0];
- const px=200+x*18,py=200-y*18;
+function ans(v){const q=qs[i];sc[q[2]]+=v*q[1];i++;if(i<qs.length)show();else{const c=a=>qs.filter(q=>q[2]==a).length*2;showResult(sc.E/c("E")*10,sc.S/c("S")*10,sc.N/c("N")*10)}}
+function showResult(x,y,n){
+ clearFx();
+ const r=IDEO.map(d=>[d[0],Math.sqrt(W[0]*(d[1]-x)**2+W[1]*(d[2]-y)**2+W[2]*(d[3]-n)**2)]).sort((a,b)=>a[1]-b[1]);
+ const top=r[0][0],px=200+x*18,py=200-y*18;
  m.innerHTML=`<div class="meta">Your result</div><div class="name">${top}</div>
- <div><span class="badge">Economic ${x.toFixed(1)} (${x<0?"left":"right"})</span><span class="badge">Social ${y.toFixed(1)} (${y<0?"libertarian":"authoritarian"})</span></div>
+ <div><span class="badge">Economic ${x.toFixed(1)} (${x<0?"left":"right"})</span><span class="badge">Social ${y.toFixed(1)} (${y<0?"libertarian":"authoritarian"})</span><span class="badge">National ${n.toFixed(1)} (${n<0?"globalist":"nationalist"})</span></div>
  <svg viewBox="0 0 400 400" role="img" aria-label="Political compass position"><rect width="200" height="200" fill="#4a1c1c"/><rect x="200" width="200" height="200" fill="#1c2a4a"/><rect y="200" width="200" height="200" fill="#1c4a2c"/><rect x="200" y="200" width="200" height="200" fill="#4a3f1c"/>
- <path d="M200 0V400M0 200H400" stroke="#8b949e" stroke-width="1"/>
+ <path d="M200 0V400M0 200H400" stroke="#8b949e"/>
  <g fill="#8b949e" font-size="11"><text x="6" y="14">Authoritarian left</text><text x="394" y="14" text-anchor="end">Authoritarian right</text><text x="6" y="394">Libertarian left</text><text x="394" y="394" text-anchor="end">Libertarian right</text></g>
  <circle cx="${px}" cy="${py}" r="9" fill="#f85149" stroke="#fff" stroke-width="2"/></svg>
  <div class="card"><h3>Closest matches</h3><ol class="near">${r.slice(1,5).map(a=>`<li>${a[0]}</li>`).join("")}</ol></div>
- <div class="row"><button class="pri" onclick="start('${len}')">Retake</button><button onclick="home()">Main menu</button></div>`;
- const egg=EGGS.find(e=>e.test(top));if(egg)fire(egg)}
+ <div class="row"><button class="pri" onclick="len?start(len):home()">Retake</button><button onclick="home()">Main menu</button></div>`;
+ const egg=EGGS.find(e=>e.names.includes(top));if(egg)fire(egg)}
 function fire(e){
  app.classList.add("fx");
  const l=new Image();l.src=e.left;l.className="side l spin";l.alt="";
  const r=new Image();r.src=e.right;r.className="side r bob";r.alt="";
  app.append(l,r);au.src=e.audio;au.play().catch(()=>{})}
+
+// ===== DEV PANEL (hold J + K) =====
+const dev=document.createElement("div");dev.id="dev";
+dev.innerHTML=`<b>Dev: jump to result</b>
+<label>Ideology<select id="dsel"><option value="">Custom (use sliders)</option>${IDEO.map((d,k)=>`<option value="${k}">${d[0]}</option>`).join("")}</select></label>
+<label>Economic <span id="vx">0</span><input type="range" id="dx" min="-10" max="10" step=".5" value="0"></label>
+<label>Social <span id="vy">0</span><input type="range" id="dy" min="-10" max="10" step=".5" value="0"></label>
+<label>National <span id="vn">0</span><input type="range" id="dn" min="-10" max="10" step=".5" value="0"></label>
+<div class="row" style="margin-top:12px"><button class="pri" id="dgo">Show result</button><button id="dx2">Close</button></div>`;
+document.body.append(dev);
+const sl={x:$("#dx"),y:$("#dy"),n:$("#dn")};
+const sync=()=>{for(const k in sl)$("#v"+k).textContent=sl[k].value};
+Object.values(sl).forEach(s=>s.oninput=()=>{$("#dsel").value="";sync()});
+$("#dsel").onchange=e=>{const d=IDEO[e.target.value];if(!d)return;sl.x.value=d[1];sl.y.value=d[2];sl.n.value=d[3];sync()};
+$("#dgo").onclick=()=>showResult(+sl.x.value,+sl.y.value,+sl.n.value);
+$("#dx2").onclick=()=>dev.style.display="none";
+const held=new Set();
+addEventListener("keydown",e=>{held.add(e.key.toLowerCase());if(held.has("j")&&held.has("k"))dev.style.display=dev.style.display==="block"?"none":"block"});
+addEventListener("keyup",e=>held.delete(e.key.toLowerCase()));
+addEventListener("blur",()=>held.clear());
 home();
 </script></body></html>
