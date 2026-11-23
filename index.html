@@ -56,10 +56,53 @@ svg{width:100%;max-width:460px;display:block;margin:12px auto;border:1px solid v
 // ===== DATA =====
 // [name, economic(-10 left..10 right), social(-10 libertarian..10 authoritarian), nationalism(-10 globalist..10 nationalist)]
 const IDEO=[["Stalinism",-9,9,3],["Maoism",-8,7,4],["Leninism",-8,6,-3],["Marxism-Leninism",-7,8,0],["Communism",-9,2,-7],["Marxism",-7,3,-7],["Trotskyism",-7,0,-9],["Anarcho-Communism",-9,-8,-9],["Anarcho-Syndicalism",-7,-8,-8],["Anarchism",-5,-10,-8],["Libertarian Socialism",-6,-6,-7],["Democratic Socialism",-5,-1,-4],["Eco-Socialism",-6,-3,-6],["Social Democracy",-3,-1,-3],["Market Socialism",-4,1,-3],["Left-Wing Populism",-4,3,2],["Progressivism",-3,-4,-5],["Social Liberalism",-2,-5,-5],["Left-Libertarianism",-3,-8,-6],["Green Politics",-4,-5,-6],["Liberalism",1,-4,-4],["Classical Liberalism",4,-5,-4],["Neoliberalism",5,-2,-4],["Libertarianism",7,-8,-3],["Minarchism",8,-6,-2],["Anarcho-Capitalism",10,-10,-5],["Objectivism",9,-5,-2],["Centrism",0,0,0],["Third Way",1,0,-2],["Technocracy",0,4,-2],["Conservatism",5,4,4],["Liberal Conservatism",5,0,1],["Fiscal Conservatism",7,-1,0],["Neoconservatism",6,6,5],["Paleoconservatism",5,6,8],["Christian Democracy",2,3,2],["Right-Wing Populism",3,6,7],["Nationalism",3,7,9],["Authoritarian Capitalism",8,8,4],["Monarchism",5,8,5],["Theocracy",2,9,4],["Fascism",3,9,10],["Nazism",4,10,10],["Corporatism",2,7,6],["National Bolshevism",-2,8,8],["Social Authoritarianism",-4,6,2],["Distributism",-2,2,1],["Georgism",-1,-3,-3],["Mutualism",-5,-7,-6],["Paternalistic Conservatism",3,3,4],["Communitarianism",-1,4,3],["Libertarian Conservatism",6,-3,3]];
+
 // [text, sign]  sign +1: agreeing = right / authoritarian / nationalist
-const E=[["Free markets allocate resources better than governments.",1],["The wealthy should be taxed far more to fund public services.",-1],["Private companies, not the state, should run healthcare.",1],["Workers should own or control the companies they work at.",-1],["Minimum wage laws do more harm than good.",1],["Energy and railways should be publicly owned.",-1],["Inheritance should not be taxed.",1],["Billionaires should not exist.",-1],["Welfare programs make people dependent.",1],["Rent and housing prices should be controlled by the state.",-1],["Trade unions have too much power.",1],["Education should be free at every level.",-1]];
-const S=[["Obedience to authority is a core virtue.",1],["Drug use should be legal for adults.",-1],["Strong leaders matter more than debate and compromise.",1],["Government surveillance of citizens is never justified.",-1],["Traditional values should be protected by law.",1],["Same-sex marriage should be fully legal.",-1],["The state should control media to stop disinformation.",1],["Free speech should cover even offensive views.",-1],["Harsh punishments deter crime effectively.",1],["Police powers should be strictly limited.",-1],["Order is more important than liberty.",1],["Censorship is always wrong.",-1]];
-const N=[["My nation's interests should come before international cooperation.",1],["International bodies should have real power over nations.",-1],["Industry should serve the national interest under state direction.",1],["Nations are arbitrary; all peoples are fundamentally equal.",-1],["National rebirth requires sacrifice from the people.",1],["Patriotism is overrated.",-1],["Class conflict should be replaced by national unity.",1],["People should see themselves as global citizens first.",-1],["Violence can be justified to defend the nation.",1],["Cultural mixing makes a country stronger.",-1],["A nation's culture should be protected from foreign influence.",1],["Armies and flags do more harm than good.",-1]];
+const E=[
+["Free markets are based.",1],
+["Tax the rich into oblivion.",-1],
+["Private healthcare is better.",1],
+["Workers should seize the means.",-1],
+["Minimum wage is retarded.",1],
+["Nationalize energy and railways.",-1],
+["Inheritance tax is theft.",1],
+["Billionaires should not exist.",-1],
+["Welfare creates parasites.",1],
+["The state should control rent.",-1],
+["Unions have too much power.",1],
+["Education should be free forever.",-1]
+];
+
+const S=[
+["Obedience to authority is based.",1],
+["All drugs should be legal!",-1],
+["Strong leaders > democracy.",1],
+["Mass surveillance is never okay.",-1],
+["Traditional values must be enforced.",1],
+["Faggots should exist.",-1],
+["The state should control the media.",1],
+["Free speech includes hate speech.",-1],
+["Harsh punishments work.",1],
+["Police powers should be limited.",-1],
+["Order is more important than liberty.",1],
+["Censorship is always wrong.",-1]
+];
+
+const N=[
+["My nation comes first.",1],
+["International bodies should have real power.",-1],
+["Industry should serve the nation.",1],
+["Nations are fake and gay.",-1],
+["National rebirth requires sacrifice.",1],
+["Patriotism is overrated.",-1],
+["Class conflict is a jewish trick.",1],
+["We should be global citizens first.",-1],
+["Violence is justified to defend the nation.",1],
+["Diversity is our strength.",-1],
+["Protect the culture from foreign influence.",1],
+["Armies and flags are gay.",-1]
+];
+
 const QS=[];for(let i=0;i<12;i++){QS.push([...E[i],"E"],[...S[i],"S"],[...N[i],"N"])}
 const LEN={short:12,medium:24,long:36};
 const ANS=[["Strongly agree",2],["Agree",1],["Neutral",0],["Disagree",-1],["Strongly disagree",-2]];
