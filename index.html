@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Feuer</title>
+<link href="https://fonts.googleapis.com/css2?family=UnifrakturCook:wght@700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0d1117;--card:#161b22;--bd:#30363d;--tx:#e6edf3;--mu:#8b949e;--gr:#238636;--bl:#58a6ff}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font:14px/1.5 -apple-system,"Segoe UI",Helvetica,Arial,sans-serif;overflow-x:hidden}
+header{display:flex;align-items:center;gap:12px;padding:14px 24px;border-bottom:1px solid var(--bd);background:#010409}
+header b{font-family:"UnifrakturCook","Old English Text MT","Blackletter",serif;font-size:24px;cursor:pointer}
+header span{color:var(--mu)}
+#app{min-height:calc(100vh - 56px)}
+main{max-width:720px;margin:0 auto;padding:40px 20px;position:relative;z-index:2}
+h1.t{font-family:"UnifrakturCook","Old English Text MT","Blackletter",serif;font-size:clamp(72px,16vw,150px);line-height:1;margin:10px 0 6px;text-align:center;font-weight:700}
+.sub{text-align:center;color:var(--mu);margin-bottom:28px;font-size:16px}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:6px;padding:20px;margin-bottom:16px}
+.card h3{margin:0 0 6px;font-size:16px}
+.card p{margin:0 0 14px;color:var(--mu)}
+button{font:inherit;color:var(--tx);background:#21262d;border:1px solid var(--bd);border-radius:6px;padding:6px 14px;cursor:pointer}
+button:hover{background:#30363d}
+button:focus-visible{outline:2px solid var(--bl);outline-offset:2px}
+button.pri{background:var(--gr);border-color:#2ea043;color:#fff;font-weight:600}
+button.pri:hover{background:#2ea043}
+.row{display:flex;gap:10px;flex-wrap:wrap}
+.opts{display:grid;gap:8px}
+.opts button{text-align:left;padding:10px 14px}
+.bar{height:8px;background:#21262d;border-radius:4px;overflow:hidden;margin-bottom:18px}
+.bar i{display:block;height:100%;background:var(--gr);transition:width .2s}
+.q{font-size:20px;margin:0 0 18px;font-weight:600}
+.meta{color:var(--mu);margin-bottom:8px}
+.badge{display:inline-block;border:1px solid var(--bd);border-radius:20px;padding:0 10px;color:var(--mu);font-size:12px;margin-right:6px}
+.name{font-size:32px;font-weight:600;margin:6px 0 4px}
+svg{width:100%;max-width:460px;display:block;margin:12px auto;border:1px solid var(--bd);border-radius:6px}
+.near{margin:0;padding-left:18px;color:var(--mu)}
+.side{position:fixed;top:50%;z-index:1;pointer-events:none;max-width:26vw;max-height:60vh;object-fit:contain}
+.side.l{left:2vw;width:300px;transform:translateY(-50%)}
+.side.r{right:2vw;width:340px;transform:translateY(-50%)}
+.spin{animation:spin 6s linear infinite}
+.bob{animation:bob 4s ease-in-out infinite}
+@keyframes spin{to{transform:translateY(-50%) rotate(360deg)}}
+@keyframes bob{0%,100%{transform:translateY(calc(-50% - 8px))}50%{transform:translateY(calc(-50% + 8px))}}
+#app.fx{filter:brightness(1.3) saturate(2) contrast(1.15);animation:shake .12s infinite,hue 5s linear infinite}
+@keyframes shake{0%{transform:translate(1px,1px)}25%{transform:translate(-1px,1px)}50%{transform:translate(1px,-1px)}75%{transform:translate(-1px,-1px)}100%{transform:translate(1px,1px)}}
+@keyframes hue{to{filter:brightness(1.3) saturate(2) contrast(1.15) hue-rotate(360deg)}}
+@media(max-width:800px){.side{opacity:.35;max-width:40vw}}
+@media(prefers-reduced-motion:reduce){.spin,.bob,#app.fx{animation:none}}
+</style></head><body>
+<header><svg viewBox="0 0 16 16" width="28" height="28" style="width:28px;border:0;margin:0" fill="#e6edf3"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38v-1.33c-2.22.48-2.69-1.07-2.69-1.07-.36-.92-.89-1.17-.89-1.17-.73-.5.05-.49.05-.49.8.06 1.23.83 1.23.83.71 1.22 1.87.87 2.33.66.07-.52.28-.87.5-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.6 7.6 0 0 1 4 0c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.28.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48v2.2c0 .21.15.46.55.38A8 8 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg><b onclick="home()">Feuer</b><span>/ political compass</span></header>
+<div id="app"><main id="m"></main></div>
+<audio id="au" loop></audio>
+<script>
+// ---- DATA ----
+// x: economic (-10 left .. 10 right), y: social (-10 libertarian .. 10 authoritarian)
+const IDEO=[["Stalinism",-9,9],["Maoism",-8,7],["Leninism",-8,6],["Marxism-Leninism",-7,8],["Communism",-9,2],["Marxism",-7,3],["Trotskyism",-7,0],["Anarcho-Communism",-9,-8],["Anarcho-Syndicalism",-7,-8],["Anarchism",-5,-10],["Libertarian Socialism",-6,-6],["Democratic Socialism",-5,-1],["Eco-Socialism",-6,-3],["Social Democracy",-3,-1],["Market Socialism",-4,1],["Left-Wing Populism",-4,3],["Progressivism",-3,-4],["Social Liberalism",-2,-5],["Left-Libertarianism",-3,-8],["Green Politics",-4,-5],["Liberalism",1,-4],["Classical Liberalism",4,-5],["Neoliberalism",5,-2],["Libertarianism",7,-8],["Minarchism",8,-6],["Anarcho-Capitalism",10,-10],["Objectivism",9,-5],["Centrism",0,0],["Third Way",1,0],["Technocracy",0,4],["Conservatism",5,4],["Liberal Conservatism",5,0],["Fiscal Conservatism",7,-1],["Neoconservatism",6,6],["Paleoconservatism",5,6],["Christian Democracy",2,3],["Right-Wing Populism",3,6],["Nationalism",3,7],["Authoritarian Capitalism",8,8],["Monarchism",5,8],["Theocracy",2,9],["Fascism",3,9],["Nazism",4,10],["Corporatism",2,7],["National Bolshevism",-2,8],["Social Authoritarianism",-4,6],["Distributism",-2,2],["Georgism",-1,-3],["Mutualism",-5,-7],["Paternalistic Conservatism",3,3],["Communitarianism",-1,4],["Libertarian Conservatism",6,-3]];
+// [text, axis, sign] sign +1: agreeing = right (E) / authoritarian (S)
+const E=[["Free markets allocate resources better than governments.",1],["The wealthy should be taxed far more to fund public services.",-1],["Private companies, not the state, should run healthcare.",1],["Workers should own or control the companies they work at.",-1],["Minimum wage laws do more harm than good.",1],["Energy and railways should be publicly owned.",-1],["Inheritance should not be taxed.",1],["Billionaires should not exist.",-1],["Welfare programs make people dependent.",1],["Rent and housing prices should be controlled by the state.",-1],["Trade unions have too much power.",1],["Education should be free at every level.",-1],["Competition matters more than equality.",1],["A universal basic income should be introduced.",-1],["Privatising state services usually improves them.",1],["Capitalism is fundamentally exploitative.",-1],["Property rights are absolute.",1],["The economy should be planned democratically, not left to markets.",-1]];
+const S=[["Obedience to authority is a core virtue.",1],["Drug use should be legal for adults.",-1],["Strong leaders matter more than debate and compromise.",1],["Government surveillance of citizens is never justified.",-1],["Traditional values should be protected by law.",1],["Same-sex marriage should be fully legal.",-1],["The nation comes before the individual.",1],["Free speech should cover even offensive views.",-1],["Harsh punishments deter crime effectively.",1],["Immigration should be largely open.",-1],["Military service should be compulsory.",1],["Abortion should be the individual's choice.",-1],["The state should control media to stop disinformation.",1],["Police powers should be strictly limited.",-1],["Religion should shape public law.",1],["Nobody should be forced to follow the state's authority.",-1],["Order is more important than liberty.",1],["Censorship is always wrong.",-1]];
+const QS=[];for(let i=0;i<18;i++){QS.push([...E[i],"E"]);QS.push([...S[i],"S"])}
+const LEN={short:12,medium:24,long:36};
+const ANS=[["Strongly agree",2],["Agree",1],["Neutral",0],["Disagree",-1],["Strongly disagree",-2]];
+
+// ---- EASTER EGGS ----
+const AUD="https://cdn.discordapp.com/attachments/1447635435353411746/";
+const EGGS=[
+ {test:n=>/Communism|Leninism|Stalinism/.test(n),
+  left:"https://thumb.wikimedia.org/wikipedia/commons/thumb/4/41/Hammer_and_sickle_red_on_transparent.svg/250px-Hammer_and_sickle_red_on_transparent.svg.png",
+  right:"https://soyjakwiki.org/images/b/ba/Marx_A24_Slowburn.png",
+  audio:AUD+"1574451938781560862/Ballern_und_Saufen_Slowed_Version.mp3?ex=6b05b222&is=6b0460a2&hm=a64394fdcd087b387b5959ce925d61a2d02002a88e9557dd30cc6f90b15ecab6&"},
+ {test:n=>/Anarcho-Capitalism|^Libertarianism$/.test(n),
+  left:"https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e6/Anarcho_Capitalism_Symbol.svg/960px-Anarcho_Capitalism_Symbol.svg.png",
+  right:"https://soyjakwiki.org/images/thumb/7/7a/Puppeteer.png/960px-Puppeteer.png.webp",
+  audio:AUD+"1574453108648575036/Jeffrey_Epstein_Lil_Pump_Boss_X_Hunniddolla_Slowed.mp3?ex=6b05b339&is=6b0461b9&hm=2f6165e984a8f3a62f76a4c91d2e90b6f958ae64fe5d5c8b293ae2b9f49a7f5e&"}
+];
+// Fascism/Nazism: no easter egg; they get the normal result screen.
+
+// ---- STATE / UI ----
+const $=s=>document.querySelector(s),m=$("#m"),app=$("#app"),au=$("#au");
+let qs=[],i=0,sc,len;
+function clearFx(){au.pause();au.removeAttribute("src");app.classList.remove("fx");document.querySelectorAll(".side").forEach(e=>e.remove())}
+function home(){clearFx();m.innerHTML=`<h1 class="t">Feuer</h1><p class="sub">Find your place on the political compass.</p>
+<div class="card"><h3>Choose a test length</h3><p>Answers are scored on two axes: economic and social.</p>
+<div class="row"><button class="pri" onclick="start('short')">Short (12)</button><button class="pri" onclick="start('medium')">Medium (24)</button><button class="pri" onclick="start('long')">Long (36)</button></div></div>
+<div class="card"><h3>What you get</h3><p style="margin:0">A plotted position on the compass and a match from 52 ideologies.</p></div>`}
+function start(k){clearFx();len=k;qs=QS.slice(0,LEN[k]);i=0;sc={E:0,S:0};show()}
+function show(){const q=qs[i];m.innerHTML=`<div class="meta">Question ${i+1} of ${qs.length}</div><div class="bar"><i style="width:${i/qs.length*100}%"></i></div>
+<div class="card"><p class="q">${q[0]}</p><div class="opts">${ANS.map(a=>`<button onclick="ans(${a[1]})">${a[0]}</button>`).join("")}</div></div>
+<button onclick="home()">Quit to main menu</button>`}
+function ans(v){const q=qs[i];sc[q[2]]+=v*q[1];i++;i<qs.length?show():result()}
+function result(){
+ const nE=qs.filter(q=>q[2]=="E").length,nS=qs.length-nE;
+ const x=sc.E/(nE*2)*10,y=sc.S/(nS*2)*10;
+ const r=IDEO.map(d=>[d[0],Math.hypot(d[1]-x,d[2]-y)]).sort((a,b)=>a[1]-b[1]);
+ const top=r[0][0];
+ const px=200+x*18,py=200-y*18;
+ m.innerHTML=`<div class="meta">Your result</div><div class="name">${top}</div>
+ <div><span class="badge">Economic ${x.toFixed(1)} (${x<0?"left":"right"})</span><span class="badge">Social ${y.toFixed(1)} (${y<0?"libertarian":"authoritarian"})</span></div>
+ <svg viewBox="0 0 400 400" role="img" aria-label="Political compass position"><rect width="200" height="200" fill="#4a1c1c"/><rect x="200" width="200" height="200" fill="#1c2a4a"/><rect y="200" width="200" height="200" fill="#1c4a2c"/><rect x="200" y="200" width="200" height="200" fill="#4a3f1c"/>
+ <path d="M200 0V400M0 200H400" stroke="#8b949e" stroke-width="1"/>
+ <g fill="#8b949e" font-size="11"><text x="6" y="14">Authoritarian left</text><text x="394" y="14" text-anchor="end">Authoritarian right</text><text x="6" y="394">Libertarian left</text><text x="394" y="394" text-anchor="end">Libertarian right</text></g>
+ <circle cx="${px}" cy="${py}" r="9" fill="#f85149" stroke="#fff" stroke-width="2"/></svg>
+ <div class="card"><h3>Closest matches</h3><ol class="near">${r.slice(1,5).map(a=>`<li>${a[0]}</li>`).join("")}</ol></div>
+ <div class="row"><button class="pri" onclick="start('${len}')">Retake</button><button onclick="home()">Main menu</button></div>`;
+ const egg=EGGS.find(e=>e.test(top));if(egg)fire(egg)}
+function fire(e){
+ app.classList.add("fx");
+ const l=new Image();l.src=e.left;l.className="side l spin";l.alt="";
+ const r=new Image();r.src=e.right;r.className="side r bob";r.alt="";
+ app.append(l,r);au.src=e.audio;au.play().catch(()=>{})}
+home();
+</script></body></html>
